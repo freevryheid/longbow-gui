@@ -5,7 +5,7 @@ author        = "Andre Smit"
 description   = "An SDL based gui for Longbow"
 license       = "MIT"
 skipExt       = @["nim"]
-bin           = @["lbg"]
+bin           = @["longbowgui"]
 
 # Dependencies
 
