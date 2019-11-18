@@ -1,5 +1,5 @@
 # longbow-gui
-a gui for longbow
+a gui for longbow. It functions but is still a work in progress!
 
 ## Installation
 git clone this, cd into the cloned directory and run:
