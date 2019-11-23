@@ -343,7 +343,7 @@ method loop(self: GFX; process: Process) {.base.} =
 
     else:
       setCursor(self.wait_cursor)
-      title = "Longbow: " & info.overs
+      title = "Longbow: " & info.overs & " - ESC to exit"
       self.window.setTitle(title)
 
     self.events(info)
@@ -360,7 +360,7 @@ proc main(depth=5, black=false, flip=false) =
     args.add("-b")
   if flip:
     args.add("-f")
-  let process = startProcess("longbow", args=args, options={poDaemon})
+  let process = startProcess("longbow", args=args, options={poInteractive,poDaemon})
 
   open(channel)
   spawn listen(process.outputStream)
