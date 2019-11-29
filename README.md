@@ -8,7 +8,7 @@ git clone this, cd into the cloned directory and run:
 nimble build
 ```
 
-This will install any needed libraries and build a **longbow-gui** executable. This requires a copy of the longbow binary in the same folder to run. You can use the one included for linux64 or compile it from here:
+This will install any needed libraries and build a **longbow-gui** executable. This requires a copy of the longbow binary in the same folder to run. You can compile it from here:
 
 https://github.com/freevryheid/longbow
 

@@ -13,7 +13,7 @@ import
 const
   BOARD = 512
   SQUARE = BOARD div 8
-  FPS = 20.cint  # frames per second
+  FPS = 20.cint # frames per second
 
 type
   GFX = ref object of Rootobj
@@ -48,31 +48,34 @@ type
 var channel: Channel[Info]
 
 template staticReadRW(filename: string): ptr RWops =
-  const file = staticRead(filename)  # embed fonts
+  const file = staticRead(filename) # embed fonts
   rwFromConstMem(file.cstring, file.len)
 
 proc boardtex(renderer: RendererPtr): TexturePtr =
-  result = renderer.createTexture(SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, BOARD, BOARD)
+  result = renderer.createTexture(SDL_PIXELFORMAT_RGBA8888,
+      SDL_TEXTUREACCESS_TARGET, BOARD, BOARD)
   renderer.setRenderTarget(result)
   var k = true
   for i in 0 .. 8:
     for j in 0 .. 8:
       if k:
-        renderer.setDrawColor 128,128,128,255  # light
+        renderer.setDrawColor 128, 128, 128, 255 # light
       else:
-        renderer.setDrawColor 84,84,84,255  # dark
+        renderer.setDrawColor 84, 84, 84, 255 # dark
       k = not k
       var r = rect((i*SQUARE).cint, (j*SQUARE).cint, SQUARE, SQUARE)
       renderer.fillRect(addr r)
   renderer.setRenderTarget(nil)
 
-proc piecetex(renderer: RendererPtr; font: FontPtr; t: string; c: Color): TexturePtr =
+proc piecetex(renderer: RendererPtr; font: FontPtr; t: string;
+    c: Color): TexturePtr =
   var surf = font.renderTextBlended(t, c)
   result = renderer.createTextureFromSurface(surf)
   surf.destroy()
 
-proc spotex(renderer: RendererPtr; col: Color ): TexturePtr =
-  result = renderer.createTexture(SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, SQUARE, SQUARE)
+proc spotex(renderer: RendererPtr; col: Color): TexturePtr =
+  result = renderer.createTexture(SDL_PIXELFORMAT_RGBA8888,
+      SDL_TEXTUREACCESS_TARGET, SQUARE, SQUARE)
   renderer.setRenderTarget(result)
   renderer.setDrawColor col
   var r = rect(0.cint, 0.cint, SQUARE, SQUARE)
@@ -105,23 +108,25 @@ method setup(self: GFX; params: Params) {.base.} =
   self.black = params.black
   self.flip = params.flip
 
-  self.window = createWindow("Longbow", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, BOARD, BOARD, SDL_WINDOW_SHOWN)
-  self.renderer = createRenderer(self.window, -1, Renderer_Accelerated or Renderer_PresentVsync or Renderer_TargetTexture)
+  self.window = createWindow("Longbow", SDL_WINDOWPOS_UNDEFINED,
+      SDL_WINDOWPOS_UNDEFINED, BOARD, BOARD, SDL_WINDOW_SHOWN)
+  self.renderer = createRenderer(self.window, -1, Renderer_Accelerated or
+      Renderer_PresentVsync or Renderer_TargetTexture)
   self.renderer.setDrawBlendMode(BlendMode_Blend)
   var
     font = openFontRW(staticReadRW("data/chess.otf"), freesrc = 1, BOARD.cint)
-    black = color(0,0,0,255)
-    white = color(255,255,255,255)
-    red = color(255,0,0,128)
-    green = color(0,255,0,128)
-    blue = color(0,0,255,128)
+    black = color(0, 0, 0, 255)
+    white = color(255, 255, 255, 255)
+    red = color(255, 0, 0, 128)
+    green = color(0, 255, 0, 128)
+    blue = color(0, 0, 255, 128)
     brd = boardtex(self.renderer)
-    wp = self.renderer.piecetex(font,"p", white)
-    wn = self.renderer.piecetex(font,"n", white)
-    wb = self.renderer.piecetex(font,"b", white)
-    bp = self.renderer.piecetex(font,"p", black)
-    bn = self.renderer.piecetex(font,"n", black)
-    bb = self.renderer.piecetex(font,"b", black)
+    wp = self.renderer.piecetex(font, "p", white)
+    wn = self.renderer.piecetex(font, "n", white)
+    wb = self.renderer.piecetex(font, "b", white)
+    bp = self.renderer.piecetex(font, "p", black)
+    bn = self.renderer.piecetex(font, "n", black)
+    bb = self.renderer.piecetex(font, "b", black)
     rs = self.renderer.spotex(red)
     gs = self.renderer.spotex(green)
     bs = self.renderer.spotex(blue)
@@ -148,8 +153,8 @@ method setup(self: GFX; params: Params) {.base.} =
   self.piece_char = piece_char
   self.color = init_color
   self.piece = init_piece
-  self.lastpremove = 64  # off-board
-  self.lastpostmove = 64  # off-board
+  self.lastpremove = 64 # off-board
+  self.lastpostmove = 64 # off-board
 
 proc notEmpty(s: string): bool =
   len(s) > 0
@@ -217,12 +222,15 @@ method events(self: GFX; info: var Info) {.base.} =
             mr = mouseY div SQUARE
             if not self.pickup:
               self.premove = 63-(8*mr+mc)
-              if (self.premove in info.pre) and ((self.color[self.premove] == BLACK and self.black) or (self.color[self.premove] == WHITE and not self.black)):
+              if (self.premove in info.pre) and ((self.color[self.premove] ==
+                  BLACK and self.black) or (self.color[self.premove] ==
+                  WHITE and not self.black)):
                 self.pickup = true
             else:
               self.postmove = 63-(8*mr+mc)
               for i, p in info.post:
-                if (p == self.postmove) and (self.premove == info.pre[i]):  #  player makes a move
+                if (p == self.postmove) and (self.premove == info.pre[
+                    i]): #  player makes a move
                   self.pickup = false
                   info.action = true
                   break
@@ -245,7 +253,7 @@ method render(self: GFX; info: Info) {.base.} =
       x = SQUARE*COL(j)
       y = SQUARE*(7-ROW(j))
       R = rect(x.cint, y.cint, SQUARE.cint, SQUARE.cint)
-      if self.piece[j] == 0:  # NONE
+      if self.piece[j] == 0: # NONE
         self.renderer.copy(self.texary[8], nil, addr R)
       else:
         self.renderer.copy(self.texary[7], nil, addr R)
@@ -271,7 +279,8 @@ method render(self: GFX; info: Info) {.base.} =
   # selected piece
   if self.pickup:
     getMouseState(mouseX, mouseY)
-    R = rect((mouseX - SQUARE div 2).cint, (mouseY - SQUARE div 2).cint, SQUARE.cint, SQUARE.cint)
+    R = rect((mouseX - SQUARE div 2).cint, (mouseY - SQUARE div 2).cint,
+        SQUARE.cint, SQUARE.cint)
     self.renderer.copy(self.gettex(self.premove), nil, addr R)
 
   self.renderer.present
@@ -350,7 +359,7 @@ method loop(self: GFX; process: Process) {.base.} =
     self.render(info)
     fpsman.delay
 
-proc main(depth=5, black=false, flip=false) =
+proc main(depth = 5; black = false; flip = false) =
   let
     gfx = GFX()
     params = (black: black, flip: flip)
@@ -360,7 +369,7 @@ proc main(depth=5, black=false, flip=false) =
     args.add("-b")
   if flip:
     args.add("-f")
-  let process = startProcess("longbow", args=args, options={poInteractive,poDaemon})
+  let process = startProcess("longbow", args = args, options = {poInteractive, poDaemon})
 
   open(channel)
   spawn listen(process.outputStream)
